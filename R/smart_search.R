@@ -1,0 +1,244 @@
+# Function to start the search process, if fuzzy is false then char_range is zero
+start_search <- function (terget_string, ref_vector, fuzzy = TRUE, char_range = 2) {
+
+  # Get the wanted string in words/letters
+  terget_string__in_words  <- unlist(strsplit(terget_string, " "))
+  num_wanted_words          <- length(terget_string__in_words)
+
+  # Set the output variable of the list [Will be used to sort the matched reference elements according to accuracy of the match]
+  # its format will be: [vector for each match]
+  # matches_parameters <- list( c(wanted_word_index, ref_word_index, ref_item_index, letters_matched_percentage) )
+  matches_parameters <- list(NULL)
+
+  # Start a loop to check in every item in the reference vector
+  reference_index_counter <- 1
+  for ( reference_index_counter in 1:length(ref_vector) ) {
+    # Get the current item in the reference vector
+    current_reference_item <- ref_vector[reference_index_counter]
+    # Start a loop to search for every word in the wanted string
+    wanted_index_counter <- 1
+    for ( wanted_index_counter in 1:num_wanted_words ) {
+
+      # Getting the current wanted word
+      current_wanted_word <- terget_string__in_words[wanted_index_counter]
+      # Get current reference string in words
+      current_reference_item__in_words <- unlist(strsplit(current_reference_item, " "))
+
+      # Start comparing current wanted word to every word in the current item in the reference vector
+      reference_words_index_counter <- 1
+      for (reference_words_index_counter in 1:length(current_reference_item__in_words)) {
+
+        # Getting the current reference word
+        current_reference_word <- current_reference_item__in_words[reference_words_index_counter]
+
+        # Start the actual comparing of a word to word
+        match_accuracy <- match_string_to_string(current_wanted_word, current_reference_word, fuzzy, char_range)
+
+
+        # Check if its already matched, no need to continue with this wanted word
+        if (is.null(match_accuracy) == FALSE) {
+
+          wanted_word_index <- wanted_index_counter
+          ref_word_index    <- reference_words_index_counter
+          ref_item_index    <- reference_index_counter
+
+          current_match_parameters  <- list(c(wanted_word_index, ref_item_index, ref_word_index, match_accuracy))
+          matches_parameters        <- append(matches_parameters, current_match_parameters)
+
+          # Will not break, to return if a word were found more than one time
+          # break
+
+        }
+
+      } # End of comparing one wanted word with all words of one reference string
+
+    } # End of comparing all wanted words with all words in one reference string
+  } # End of searching for all wanted word in all reference strings
+
+
+
+  # Return the matches
+  matches_parameters <- matches_parameters[2:length(matches_parameters)] # Remove the first NULL value
+  return(matches_parameters)
+
+  # Final output format will be:
+  # all_matches <- list( c(ref_str_index, ref_str_text) ) [sorted according to the previously calculated score]
+
+
+}
+
+
+#' A Smart Function that Returns All Matches of a String within a Vector, Sorted According to the Quality of the Match
+#'
+#' This function searches for a target string within a reference vector, allowing for optional fuzzy matching.
+#' It returns all matches sorted by the quality of the match, which is calculated based on several factors including
+#' the percentage of words matched, the accuracy of individual word matches, and the continuity of the matched words.
+#'
+#' @param terget_string The target string you are looking for.
+#' @param ref_vector The vector to look into.
+#' @param min_word_matches The minimum percentage of words to be matched in order to consider the case a match. Default is 0.3.
+#' @param fuzzy A logical value determining whether fuzzy matching is used or not. Default is TRUE.
+#' @param char_range The maximum tolerated number of added or removed characters in the reference word. Default is 2.
+#'
+#' @return A dataframe containing the indices, scores, and text of the matched elements in the reference vector.
+#'
+#' @examples
+#' ref_vector <- c("This is a sample text", "Another example here", "More text to match")
+#' terget_string <- "sample text"
+#' smart_search(terget_string, ref_vector, min_word_matches = 0.5, fuzzy = TRUE, char_range = 0)
+#'
+#' @export
+
+# Main function of performing smart search, if fuzzy is false then char_range is overlooked
+smart_search <- function (terget_string, ref_vector, min_word_matches = 0.3, fuzzy = TRUE, char_range = 2) {
+
+  # Doing some validations
+  if ( is.character(terget_string) == FALSE | terget_string == "" ) {
+    return("ERROR: terget_string must be a character.")
+  }
+  if ( is.character(ref_vector) == FALSE ) {
+    return("ERROR: ref_vector must be a character.")
+  }
+  if ( is.numeric(min_word_matches) == FALSE ) {
+    return("ERROR: ref_vector must be numeric.")
+  }
+
+
+  # GET THE MATCHES
+  # matches_parameters <- list( c(wanted_word_index, ref_word_index, ref_item_index, letters_matched_percentage) )
+  matches <- start_search(terget_string, ref_vector, fuzzy, char_range)
+
+  # If there is no any matches
+  if (is.null(unlist(matches[1])) == TRUE) {
+    return(NULL)
+  }
+
+  # Extract and calculate the score for all matched reference elements
+  total_matches <- length(matches) # Getting the number of matches
+  # Remember: matches are returned in a list composed of vectors for every match
+  #   Every vector contains c(wanted_word_index, ref_item_index, ref_word_index, match_accuracy)
+  matched_ref_items_indices <- NULL
+
+  # Get the matched reference elements to check the only instead of checking all items like in the previous versions
+  for ( matches_counter in 1:total_matches ) {
+    # Getting the parameters of the current match
+    current_match_ref_item_index  <- unlist(matches[matches_counter])[2]
+    matched_ref_items_indices     <- c(matched_ref_items_indices, current_match_ref_item_index)
+  }
+
+
+  # CALCULATE THE SCORES
+  final_scores <- list(NULL)
+  # Extract the parameters for each reference element and calculate the score
+  matched_ref_items_indices <- unique(matched_ref_items_indices)
+  for ( current_reference_index in matched_ref_items_indices ) {
+
+    # 4 checks will be done for every item: number of matches, unique matches percentage, successive or not, accuracy of the match
+    # Resitting all variables for each reference element
+
+    # Set the default placeholders
+    words_matched     <- NULL
+    total_accuracies  <- 0
+
+    matched_words_indices_in_ref_item <- NULL
+
+    for (matches_counter in 1:total_matches) {
+
+      matched_ref_item_index <- unlist(matches[matches_counter])[2]
+      if ( current_reference_index == matched_ref_item_index ) {
+        # Add to matches
+        words_matched    <- c(words_matched, unlist(matches[matches_counter])[1])
+        # Add to total accuracies
+        total_accuracies <- total_accuracies + unlist(matches[matches_counter])[4]
+        # Check if they are successives [not implemented yet]
+        matched_words_indices_in_ref_item <- c(matched_words_indices_in_ref_item, unlist(matches[matches_counter])[3])
+      }
+
+    }
+
+    # Calculate some parameters for this reference element
+    num_matches         <- length(words_matched)
+    unique_matches      <- unique(words_matched)
+    num_unique_matches  <- length(unique_matches)
+    mean_accuracies     <- total_accuracies/num_matches
+
+    # Check if the matched words are successive in the matched reference element or not
+    num_successive_matches <- 0
+    if ( num_unique_matches > 1 ) {
+      for ( matched_word_counter in 1:(length(words_matched)-1) ) {
+        # Getting some parameters
+        current_word_index__in_wanted_string  <- words_matched[matched_word_counter]
+        current_word_index__in_ref_item       <- matched_words_indices_in_ref_item[matched_word_counter]
+        next_word_index__in_wanted_string     <- words_matched[matched_word_counter+1]
+        next_word_index__in_ref_item          <- matched_words_indices_in_ref_item[matched_word_counter+1]
+        # Calculating
+        if ( (next_word_index__in_wanted_string - current_word_index__in_wanted_string) == (next_word_index__in_ref_item - current_word_index__in_ref_item) ) {
+          num_successive_matches <- num_successive_matches + 1
+        }
+      }
+    } # Getting the percentage of successive matches
+    percent_successive_matches <- num_successive_matches / (num_matches/2)
+
+    # Calculate the score
+    current_score     <- 0 # Default
+    num_words_to_find <- length(unlist(strsplit(terget_string, " ")))
+    if ( num_unique_matches >= min_word_matches*num_words_to_find ) {
+      current_score <-  (num_unique_matches/num_words_to_find) +
+        (num_matches/num_unique_matches) +
+        (num_matches/length(unlist(strsplit(ref_vector[current_reference_index], " ")))) +
+        (num_unique_matches/length(unlist(strsplit(ref_vector[current_reference_index], " ")))) +
+        mean_accuracies +
+        percent_successive_matches
+    }
+
+    # Add to final scores
+    if ( current_score > 0 ) {
+      final_scores  <- append(final_scores, current_score)
+    }
+    if ( current_score == 0 ) {
+      matched_ref_items_indices <- matched_ref_items_indices[-match(current_reference_index, matched_ref_items_indices)]
+    }
+
+  }
+
+
+  # SORT THE SCORES
+  if ( length(final_scores) == 1 ) { # Contains only the NULL placeholder
+    return(NULL)
+  }
+
+  final_scores  <- final_scores[2:length(final_scores)]
+  names(final_scores) <- matched_ref_items_indices
+  final_scores  <- as.list(sort(unlist(final_scores), decreasing = TRUE))
+
+  # Returning the final output
+  num_final_scores    <- length(final_scores)
+  sorted_ref_indices  <- as.numeric(names(final_scores))
+
+  # output <- list(NULL)
+  indices <- NULL
+  scores  <- NULL
+  texts   <- NULL
+
+  for (counter in 1:num_final_scores) {
+    # current_output_element <- list(c(sorted_ref_indices[counter], as.numeric(final_scores[counter]), ref_vector[sorted_ref_indices[counter]]))
+    indices <- c(indices, sorted_ref_indices[counter])
+    scores  <- c(scores, as.numeric(final_scores[counter]))
+    texts   <- c(texts, ref_vector[sorted_ref_indices[counter]])
+    # output <- append(output, current_output_element)
+  }
+
+  # output <- output[2:length(output)]
+  output <- as.data.frame( matrix(
+    data = c(
+      indices,
+      scores,
+      texts
+    ),
+    ncol = 3,
+    byrow = FALSE,
+    dimnames = list(NULL, c("Index", "Score", "Text"))
+  ) )
+  return(output)
+
+}

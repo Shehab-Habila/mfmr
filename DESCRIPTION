@@ -1,0 +1,14 @@
+Package: mfmr
+Title: Efficient Manipulation of Multiple Files with R
+Version: 0.1.0
+Authors@R: 
+    person("Shehab", "Habila", , "shehabhabilaa@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: The mfmr package provides a suite of tools for the efficient search, matching, and cleaning of multiple tables in R. Designed for ease of use and high performance, this package simplifies data manipulation tasks, enabling users to handle and process large datasets with ease.
+License: use_mit_license(copyright_holder = NULL)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Depends: 
+    R (>= 2.10)
+LazyData: true
