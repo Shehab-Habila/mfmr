@@ -101,15 +101,18 @@ cleaned_table <- unite_within_columns(my_table, columns_names = c("col1", "col2"
 ```r
 library(mfmr)
 matched_data <- match_tables(list(match_vegetables, match_fruits, match_missings), match_bill, get_columns = c("Product Name", "Cost"), according_to = "Product ID", fuzzy = FALSE)
+
+# These datasets are already imported to the package and ready to go. Just run the code.
 ```
 
 ------------------------
 
 ## Documentation
 
-Full documentation for each function documentation is available with:
+Full documentation for each function is available with:
 
 ```r
+# For example:
 ?smart_match_tables
 ```
 
@@ -131,7 +134,7 @@ This package is licensed under the MIT License.
 
 For any questions or feedback, please contact:
 
-- **Shehab Habila** (Author) - linkedin.com/in/shehab-habila-b919441a5
+- **Shehab Habila** (Author) - (https://linkedin.com/in/shehab-habila-b919441a5)
 
 ------------------------
 
