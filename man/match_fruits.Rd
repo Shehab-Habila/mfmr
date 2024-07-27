@@ -8,7 +8,7 @@
 A data frame with the following columns:
 \describe{
 \item{Product ID}{A unique identifier for each fruit product.}
-\item{Name}{The name of the fruit product.}
+\item{Product Name}{The name of the fruit product.}
 \item{Cost}{The cost of the fruit product.}
 }
 }

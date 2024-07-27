@@ -4,7 +4,9 @@
 #'
 #' @format A data frame with the following column:
 #' \describe{
-#'   \item{Product ID}{A unique identifier for each product in the bill.}
+#'   \item{Product ID}{A unique identifier for each vegetable product.}
+#'   \item{Product Name}{The name of the vegetable product.}
+#'   \item{Cost}{The cost of the vegetable product.}
 #' }
 #' @source Simulated data for practice with matching and standardize functions.
 #' @examples
@@ -18,7 +20,7 @@
 #' @format A data frame with the following columns:
 #' \describe{
 #'   \item{Product ID}{A unique identifier for each vegetable product.}
-#'   \item{Name}{The name of the vegetable product.}
+#'   \item{Product Name}{The name of the vegetable product.}
 #'   \item{Cost}{The cost of the vegetable product.}
 #' }
 #' @source Simulated data for practice with matching and standardize functions.
@@ -33,7 +35,7 @@
 #' @format A data frame with the following columns:
 #' \describe{
 #'   \item{Product ID}{A unique identifier for each fruit product.}
-#'   \item{Name}{The name of the fruit product.}
+#'   \item{Product Name}{The name of the fruit product.}
 #'   \item{Cost}{The cost of the fruit product.}
 #' }
 #' @source Simulated data for practice with matching and standardize functions.
@@ -48,7 +50,7 @@
 #' @format A data frame with the following columns:
 #' \describe{
 #'   \item{Product ID}{A unique identifier for each missing product.}
-#'   \item{Name}{The name of the missing product.}
+#'   \item{Product Name}{The name of the missing product.}
 #'   \item{Cost}{The cost of the missing product.}
 #' }
 #' @source Simulated data for practice with matching and standardize functions.

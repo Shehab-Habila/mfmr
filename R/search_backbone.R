@@ -53,7 +53,7 @@ split_and_remove_special <- function(word) {
 match_string_to_string <- function(wanted_word, ref_word, fuzzy = TRUE, char_range = 2) {
 
   # Doing some validations
-  if ( is.na(wanted_word) | is.na(ref_word) | !is.character(wanted_word) | !is.character(ref_word) ) {
+  if ( is.na(wanted_word) | is.na(ref_word) | is.null(wanted_word) | is.null(ref_word) | !is.character(wanted_word) | !is.character(ref_word) ) {
     return(NULL)
   }
 
