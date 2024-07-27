@@ -20,6 +20,9 @@ Once `devtools` is installed, you can install `mfmr` with:
 devtools::install_github("Shehab-Habila/mfmr")
 ```
 
+And if you have a problem, you may find this helpful:
+https://support.posit.co/hc/en-us/articles/206827897-Secure-Package-Downloads-for-R
+
 ------------------------
 
 ## Features
