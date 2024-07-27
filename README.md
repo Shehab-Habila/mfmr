@@ -32,6 +32,29 @@ devtools::install_github("Shehab-Habila/mfmr")
 ------------------------
 
 ## Functions
+- `split_and_remove_special()`
+- `match_string_to_string()`
+- `smart_search()`
+- `match_two_tables()`
+- `match_tables()`
+- `standardize()`
+- `standardize_vector()`
+- `standardize_col_names()`
+- `first_match()`
+- `find_value()`
+- `find_column()`
+- `unite_within_columns()`
+- `unite_values_in_table()`
+- `make_unity_table()`
+- `apply_unity_table()`
+- `auto_unite_column()`
+
+Full documentation for each function is available
+
+------------------------
+
+## Major Functions
+
 
 ### `match_tables`
 
@@ -45,6 +68,18 @@ add_to_df <- data.frame(Name = c("Alice", "Bob", "Carol", "David"))
 match_tables(get_from_list, add_to_df, c("Age", "Salary"), "Name", fuzzy = TRUE)
 ```
 
+### `find_column`
+
+Searches for a specified column name within a list of dataframes.
+
+```r
+df3 <- data.frame(Name = c("Alice", "Bob"), Age = c(25, 30))
+df4 <- data.frame(Name = c("Carol", "David"), Salary = c(50000, 60000))
+search_list2 <- list(df3, df4)
+find_column(search_list2, "name")
+find_column(search_list2, "salary", fuzzy = TRUE)
+```
+
 ### `standardize_col_names`
 
 Standardize the column names of a given table for consistency across functions. This ensures that all column names follow a consistent format, making it easier to work with the data.
@@ -54,32 +89,16 @@ df <- data.frame("First Name." = c("Alice", "Bob"), "Age" = c(25, 30))
 standardize_col_names(df, lowercase = TRUE)
 ```
 
-### `standardize_vector`
-
-Standardize values within a vector, converting them to a consistent format. This function is useful for ensuring that all values in a vector follow the same conventions.
-
-```r
-values <- c("Hello", "World", "FOO", "Bar Chart")
-standardize_vector(values, lowercase = TRUE)
-```
-
-### `standardize`
-
-Convert a string to a standardized version, removing unwanted characters and optionally converting to lowercase. This helps in cleaning up text data for further processing.
-
-```r
-standardize("Hello, World!")
-standardize("Special @# Characters!", lowercase = FALSE)
-```
-
 ### `unite_values_in_table`
 
-Unite variations of a string within a table, handling minor misspellings and variations. This function ensures that similar values are unified under a single standard value.
+Unite given variations of a string within a table, handling minor misspellings and variations. This function ensures that similar values are unified under a single standard value.
 
 ```r
-cleaned_table <- unite_values_in_table(my_table, target_values = c("var1", "var2"), unite_to = "unified_value")
+# Sample dataframe
+df <- data.frame(Name = c("Jonh Doe", "John Doe", "Jon Doe", "Jane Doe"))
 
-# These Variables Need be Declared First
+# Unite variations of "John Doe" into a single form
+df_united <- unite_values_in_table(df, c("Jonh Doe"), "John Doe", fuzzy = TRUE)
 ```
 
 ### `unite_within_columns`
@@ -87,9 +106,26 @@ cleaned_table <- unite_values_in_table(my_table, target_values = c("var1", "var2
 Unite variations of a string within specified columns of a table. This function is useful for cleaning up specific columns in a dataset by unifying similar values.
 
 ```r
-cleaned_table <- unite_within_columns(my_table, columns_names = c("col1", "col2"), target_values = c("var1", "var2"), unite_to = "unified_value")
+# Sample dataframe
+df <- data.frame(Name = c("Jonh Doe", "John Doe", "Jon Doe", "Jane Doe"),
+                  Address = c("123 Main St", "124 Main St", "123 Main Steet", "125 Main St"))
 
-# These Variables Need be Declared First
+# Unite variations of "John Doe" and "Main Steet" into standardized forms
+df_united <- unite_within_columns(df,
+                                    columns_names = c("Name", "Address"),
+                                    target_values = c("Jonh Doe", "John Doe", "Jon Doe"),
+                                    unite_to = "John Doe",
+                                    fuzzy = TRUE)
+```
+
+### `auto_unite_column`
+
+Automatically identifies and unites variations of values within a specified column in a data frame. It uses `make_unity_table` to create a unity table and `apply_unity_table` to standardize the column based on the unity table.
+
+```R
+df <- data.frame(ID = 1:6, Status = c("single", "Single", "SINGLE", "married", "Married", "MARRIED"))
+df_standardized <- auto_unite_column(df, "Status")
+print(df_standardized)
 ```
 
 ------------------------
