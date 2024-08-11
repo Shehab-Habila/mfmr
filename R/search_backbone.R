@@ -35,6 +35,7 @@ split_and_remove_special <- function(word) {
 #' This function matches two words and calculates their match accuracy.
 #' It provides an option for fuzzy matching, allowing for minor differences
 #' between the words.
+#' Note that fuzzy match doesn't work with variables that contain numbers.
 #'
 #' @param wanted_word A character string representing the first word to be matched.
 #' @param ref_word A character string representing the reference word to be compared.
@@ -53,7 +54,7 @@ split_and_remove_special <- function(word) {
 match_string_to_string <- function(wanted_word, ref_word, fuzzy = TRUE, char_range = 2) {
 
   # Doing some validations
-  if ( is.na(wanted_word) | is.na(ref_word) | is.null(wanted_word) | is.null(ref_word) | !is.character(wanted_word) | !is.character(ref_word) ) {
+  if ( is.na(wanted_word) | is.na(ref_word) | is.null(wanted_word) | is.null(ref_word) ) {
     return(NULL)
   }
 
@@ -64,7 +65,7 @@ match_string_to_string <- function(wanted_word, ref_word, fuzzy = TRUE, char_ran
   if ( wanted_word == ref_word ) {
     match_accuracy <- 1
   } else { # Check if they are alike
-    if ( isTRUE(fuzzy) ) {
+    if ( isTRUE(fuzzy) & is.character(wanted_word) & is.character(ref_word)  ) {
 
       wanted_word__in_letters <- split_and_remove_special(wanted_word)
       ref_word__in_letters    <- split_and_remove_special(ref_word)
